@@ -61,6 +61,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'logo_only': True
+    "github_url": "https://github.com/sandialabs/pvcracks/tree/main/pvcracks"
 }
 
 # Path to static files (css, javascript, images)
