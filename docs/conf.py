@@ -60,7 +60,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # Use the Read the Docs theme
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
-    'logo_only': True
+    'logo_only': True,
     "github_url": "https://github.com/sandialabs/pvcracks/tree/main/pvcracks"
 }
 
