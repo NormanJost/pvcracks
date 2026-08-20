@@ -3,7 +3,7 @@
 
 * Define the diode model
 .model sd1 D (IS=2.0780120598826555e-10 N=0.9579244607561156 EG=1.12 BV=12.0)
-.model sdby D (IS=1e-7 N=1 BV=100.0 IBV=20)
+.model sdby D (IS=1e-7 N=1 BV=20 IBV=20)
 
 * Define the DC sweep
 V1 1 0
