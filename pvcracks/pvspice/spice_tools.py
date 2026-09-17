@@ -29,10 +29,14 @@ def run_ngspice(ngpsice_path, circuit_file):
         https://ngspice.sourceforge.io/index.html
 
     """
+    import os
     import subprocess
     ngspice_command = [ngpsice_path, "-b", circuit_file]
     try:
-        subprocess.run(ngspice_command)
+        run_kwargs = {}
+        if os.name == "nt":
+            run_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+        subprocess.run(ngspice_command, **run_kwargs)
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
         print(f"Check path for ngspice, current: {ngpsice_path}")
