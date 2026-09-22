@@ -1,6 +1,6 @@
 Title: 
-Date: Thu Sep 17 10:21:37  2026
-Command: ngspice-47, Build Aug 11 2026   13:49:23
+Date: Mon Sep 21 17:53:34  2026
+Command: ngspice-47, Build Aug 11 2026   13:55:25
 Plotname: DC transfer characteristic
 Flags: real
 No. Variables: 122

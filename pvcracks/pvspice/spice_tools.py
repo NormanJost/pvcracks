@@ -8,7 +8,20 @@ Simulate modules using spice
 @author: nrjost
 """
 
-def run_ngspice(ngpsice_path, circuit_file):
+def _batch_ngspice_executable(executable):
+    """Return ngspice's console executable when a Windows install provides it."""
+    from pathlib import Path
+
+    executable = Path(executable)
+    console_executable = executable.with_name("ngspice_con.exe")
+
+    if executable.name.lower() == "ngspice.exe" and console_executable.is_file():
+        return console_executable
+
+    return executable
+
+
+def run_ngspice(ngpsice_path, circuit_file, *, capture_output=False, timeout=None):
     """
     Run ngspice using path and netlist/circuit    
     
@@ -19,9 +32,16 @@ def run_ngspice(ngpsice_path, circuit_file):
     circuit_file : str
         path to netlist, example: 'C:/Spice64/test/solar_circuit.cir'
 
+    capture_output : bool, default False
+        Capture the ngspice console output instead of printing it.
+    timeout : float, optional
+        Maximum run time in seconds.
+
     Returns
     -------
-    Nothing the output is saved to the path given in module_to_netlist
+    subprocess.CompletedProcess
+        The completed batch process. The circuit output is still saved to the
+        path given in ``module_to_netlist``.
     
     Notes
     ------
@@ -30,17 +50,33 @@ def run_ngspice(ngpsice_path, circuit_file):
 
     """
     import os
+    from pathlib import Path
     import subprocess
-    ngspice_command = [ngpsice_path, "-b", circuit_file]
+
+    circuit_path = Path(circuit_file).resolve()
+    executable = _batch_ngspice_executable(ngpsice_path)
+    ngspice_command = [str(executable), "-b", str(circuit_path)]
+
+    run_kwargs = {
+        "check": True,
+        "cwd": str(circuit_path.parent),
+        "text": True,
+        "capture_output": capture_output,
+        "timeout": timeout,
+    }
+
+    # ngspice_con.exe is a batch/console executable. On Windows, prevent it
+    # from creating a visible console window for every simulation.
+    if os.name == "nt":
+        run_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
     try:
-        run_kwargs = {}
-        if os.name == "nt":
-            run_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
-        subprocess.run(ngspice_command, **run_kwargs)
+        return subprocess.run(ngspice_command, **run_kwargs)
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-        print(f"Check path for ngspice, current: {ngpsice_path}")
-        print(f"Check path for circuit file, current: {circuit_file}")
+        details = e.stderr.strip() if e.stderr else str(e)
+        raise RuntimeError(
+            f"ngspice failed for {circuit_path}: {details}"
+        ) from e
     
 def run_xyce(xyce_path, outputfile, circuit_file):
     """
